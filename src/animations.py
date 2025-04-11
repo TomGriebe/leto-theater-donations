@@ -30,18 +30,21 @@ def remove_loop_ended_handler():
 
 def on_idle_loop_end(data):
     next_donation = None
+    donation_source = None
 
     if len(donations.queue) > 0:
         next_donation = donations.queue.pop(0)
-        log_info(f"{next_donation} dollar donation is next")
+        log_info(f"${next_donation} donation is next")
+        donation_source = sources.get_source_for_donation(next_donation)
 
-    source_name = sources.get_media_source_name_for_donation(next_donation)
-
-    if source_name is not "":
-        start_media_source_solo(source_name)
+    if donation_source:
+        start_media_source_solo(donation_source)
+        obs.obs_source_release(donation_source)
     else:
         log_info("Restarting idle")
         restart_idle()
+
+    log_info(f"Donation queue: {donations.queue}")
 
 
 def restart_idle():
@@ -52,7 +55,7 @@ def restart_idle():
         obs.obs_source_release(source)
 
 
-def start_media_source_solo(name):
-    log_info(f"Starting animation '{name}' in solo mode")
+def start_media_source_solo(source):
+    log_info(f"Starting animation in solo mode")
     # source = obs.obs_get_source_by_name(name)
     # obs.obs_source_release(source)

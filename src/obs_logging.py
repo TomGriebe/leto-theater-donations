@@ -10,7 +10,7 @@ def log_info(message):
 
 
 def log_warn(message):
-    obs.script_log(obs.LOG_WARN, message)
+    obs.script_log(obs.LOG_WARNING, message)
 
 
 def log_error(message):

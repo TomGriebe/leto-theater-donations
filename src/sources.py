@@ -12,19 +12,15 @@ def get_idle_source():
     source = obs.obs_get_source_by_name(IDLE_SOURCE)
 
     if source is None:
-        obs.script_log(obs.LOG_WARNING, "Idle media source not found")
+        log_warn("Idle media source not found")
     return source
 
 
-def get_media_source_name_for_donation(amount):
+def get_source_for_donation(amount):
     if amount is None:
-        log_info("more logs")
-        log_info("amount is None")
-        return ""
+        return None
 
-    log_info(f"amount is {amount}")
-
-    source_name = ""
+    source_name = None
 
     if amount >= 1:
         source_name = TIP_1_USD_SOURCE
@@ -35,7 +31,11 @@ def get_media_source_name_for_donation(amount):
 
     if source_name:
         log_info(f"Chosen animation: '{source_name}'")
-        return source_name
+        source = obs.obs_get_source_by_name(source_name)
+
+        if source:
+            return source
+        else:
+            log_warn(f"Could not find source for name '{source_name}'")
     else:
         log_warn(f"Could not find fitting animation for ${amount} tip")
-        return ""
