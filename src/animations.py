@@ -58,6 +58,12 @@ def set_clear_on_media_end(source, value):
     obs.obs_source_update(source, settings)
 
 
+def set_restart_on_activate(source, value):
+    settings = obs.obs_source_get_settings(source)
+    obs.obs_data_set_bool(settings, "restart_on_activate", value)
+    obs.obs_source_update(source, settings)
+
+
 def start_media_source(source):
     obs.obs_source_media_restart(source)
     set_looping(source, False)

@@ -13,26 +13,40 @@ importlib.reload(obs_logging)
 importlib.reload(sources)
 
 
-# This is run as soon as the script is loaded, to set up the basic event handling.
-def script_load(settings):
+def try_setup():
     log_info("Loading script...")
     idle_source = sources.get_idle_source()
 
     if idle_source:
         animations.set_looping(idle_source, True)
         animations.set_clear_on_media_end(idle_source, True)
+        animations.set_restart_on_activate(idle_source, True)
         animations.add_anim_ended_handler(idle_source)
         obs.obs_source_release(idle_source)
+    else:
+        log_warn("Idle source could not be found.")
+        return
 
     donation_sources = sources.get_all_donation_sources()
 
     for source in donation_sources:
-        animations.set_looping(source, False)
-        animations.set_clear_on_media_end(source, True)
-        animations.add_anim_ended_handler(source)
-        obs.obs_source_release(source)
+        if source:
+            animations.set_looping(source, False)
+            animations.set_clear_on_media_end(source, True)
+            animations.set_restart_on_activate(source, False)
+            animations.add_anim_ended_handler(source)
+            obs.obs_source_release(source)
+        else:
+            log_warn("One of the donation sources could not be found.")
+            return
 
-    log_info("Done!")
+    obs.timer_remove(try_setup)
+    log_info("Finished initial setup!")
+
+
+# This is run as soon as the script is loaded, to set up the basic event handling.
+def script_load(_):
+    obs.timer_add(try_setup, 1000)
 
 
 # This function sets up the UI properties (like buttons) for the script.
