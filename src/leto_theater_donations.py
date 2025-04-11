@@ -16,12 +16,14 @@ importlib.reload(sources)
 # This is run as soon as the script is loaded, to set up the basic event handling.
 def script_load(settings):
     log_info("Loading script...")
-    animations.add_loop_ended_handler()
+    source = sources.get_idle_source()
 
+    if source:
+        animations.set_looping(source, True)
+        animations.add_anim_ended_handler(source)
+        obs.obs_source_release(source)
 
-def script_unload():
-    log_info("Unloading script...")
-    animations.remove_loop_ended_handler()
+    log_info("Done!")
 
 
 # This function sets up the UI properties (like buttons) for the script.

@@ -3,46 +3,31 @@ from obs_logging import *
 import sources
 import donations
 
-idle_signal_handler = None
+
+def add_anim_ended_handler(source):
+    handler = obs.obs_source_get_signal_handler(source)
+    obs.signal_handler_connect(handler, "media_ended", load_next_animation)
 
 
-def add_loop_ended_handler():
-    source = sources.get_idle_source()
-
-    if source:
-        global idle_signal_handler
-        idle_signal_handler = obs.obs_source_get_signal_handler(source)
-
-        if idle_signal_handler:
-            log_info("Connecting handler to 'media_ended' signal")
-            obs.signal_handler_connect(idle_signal_handler, "media_ended", on_idle_loop_end)
-
-        obs.obs_source_release(source)
-
-
-def remove_loop_ended_handler():
-    global idle_signal_handler
-
-    if idle_signal_handler:
-        log_info("Disconnecting handler from 'media_ended' signal")
-        obs.signal_handler_disconnect(idle_signal_handler, "media_ended", on_idle_loop_end)
-
-
-def on_idle_loop_end(data):
-    next_donation = None
-    donation_source = None
-
+def load_next_animation(_):
     if len(donations.queue) > 0:
         next_donation = donations.queue.pop(0)
-        log_info(f"${next_donation} donation is next")
-        donation_source = sources.get_source_for_donation(next_donation)
+        log_info(f"Loading ${next_donation} animation.")
 
-    if donation_source:
-        start_media_source_solo(donation_source)
-        obs.obs_source_release(donation_source)
+        source = sources.get_source_for_donation(next_donation)
+
+        if source:
+            start_media_source(source)
+            obs.obs_source_release(source)
+        else:
+            # No source found for animation
+            restart_idle()
     else:
-        log_info("Restarting idle")
+        # Play idle animation again (if no more donations are queued)
+        log_warn("No donations, but idle animation ended anyway.")
+        log_warn("Restarting idle animation and enabling loop.")
         restart_idle()
+        set_idle_looping(True)
 
     log_info(f"Donation queue: {donations.queue}")
 
@@ -55,7 +40,21 @@ def restart_idle():
         obs.obs_source_release(source)
 
 
-def start_media_source_solo(source):
-    log_info(f"Starting animation in solo mode")
-    # source = obs.obs_get_source_by_name(name)
-    # obs.obs_source_release(source)
+def set_idle_looping(value):
+    source = sources.get_idle_source()
+
+    if source:
+        set_looping(source, value)
+        obs.obs_source_release(source)
+
+
+def set_looping(source, value):
+    settings = obs.obs_source_get_settings(source)
+    obs.obs_data_set_bool(settings, "looping", value)
+    obs.obs_source_update(source, settings)
+
+
+def start_media_source(source):
+    obs.obs_source_media_restart(source)
+    set_looping(source, False)
+    add_anim_ended_handler(source)

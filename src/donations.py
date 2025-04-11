@@ -1,18 +1,22 @@
 from obs_logging import *
+import animations
 
 queue = []
 
 
-def handle_donation_1_usd(props, prop):
+def handle_donation_1_usd(_, __):
     queue.append(1)
     log_info(f"Donation queue: {queue}")
+    animations.set_idle_looping(False)
 
 
-def handle_donation_5_usd(props, prop):
+def handle_donation_5_usd(_, __):
     queue.append(5)
     log_info(f"Donation queue: {queue}")
+    animations.set_idle_looping(False)
 
 
-def handle_donation_10_usd(props, prop):
+def handle_donation_10_usd(_, __):
     queue.append(10)
     log_info(f"Donation queue: {queue}")
+    animations.set_idle_looping(False)
