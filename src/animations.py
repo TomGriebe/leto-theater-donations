@@ -10,10 +10,11 @@ def add_anim_ended_handler(source):
 
 
 def load_next_animation(_):
+    log_info("Selecting next animation:")
+    log_info(f"Donation queue: {donations.queue}")
+
     if len(donations.queue) > 0:
         next_donation = donations.queue.pop(0)
-        log_info(f"Loading ${next_donation} animation.")
-
         source = sources.get_source_for_donation(next_donation)
 
         if source:
@@ -24,12 +25,9 @@ def load_next_animation(_):
             restart_idle()
     else:
         # Play idle animation again (if no more donations are queued)
-        log_warn("No donations, but idle animation ended anyway.")
-        log_warn("Restarting idle animation and enabling loop.")
+        log_info("No donations, looping idle animation.")
         restart_idle()
         set_idle_looping(True)
-
-    log_info(f"Donation queue: {donations.queue}")
 
 
 def restart_idle():
@@ -54,7 +52,12 @@ def set_looping(source, value):
     obs.obs_source_update(source, settings)
 
 
+def set_clear_on_media_end(source, value):
+    settings = obs.obs_source_get_settings(source)
+    obs.obs_data_set_bool(settings, "clear_on_media_end", value)
+    obs.obs_source_update(source, settings)
+
+
 def start_media_source(source):
     obs.obs_source_media_restart(source)
     set_looping(source, False)
-    add_anim_ended_handler(source)

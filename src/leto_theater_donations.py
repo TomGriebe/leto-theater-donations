@@ -16,10 +16,19 @@ importlib.reload(sources)
 # This is run as soon as the script is loaded, to set up the basic event handling.
 def script_load(settings):
     log_info("Loading script...")
-    source = sources.get_idle_source()
+    idle_source = sources.get_idle_source()
 
-    if source:
-        animations.set_looping(source, True)
+    if idle_source:
+        animations.set_looping(idle_source, True)
+        animations.set_clear_on_media_end(idle_source, True)
+        animations.add_anim_ended_handler(idle_source)
+        obs.obs_source_release(idle_source)
+
+    donation_sources = sources.get_all_donation_sources()
+
+    for source in donation_sources:
+        animations.set_looping(source, False)
+        animations.set_clear_on_media_end(source, True)
         animations.add_anim_ended_handler(source)
         obs.obs_source_release(source)
 

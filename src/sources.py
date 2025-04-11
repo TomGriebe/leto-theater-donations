@@ -39,3 +39,11 @@ def get_source_for_donation(amount):
             log_warn(f"Could not find source for name '{source_name}'")
     else:
         log_warn(f"Could not find fitting animation for ${amount} tip")
+
+
+def get_all_donation_sources():
+    return [
+        obs.obs_get_source_by_name(TIP_1_USD_SOURCE),
+        obs.obs_get_source_by_name(TIP_5_USD_SOURCE),
+        obs.obs_get_source_by_name(TIP_10_USD_SOURCE),
+    ]
