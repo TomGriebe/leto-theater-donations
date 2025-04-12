@@ -15,7 +15,7 @@ def load_next_animation(_):
 
     if len(donations.queue) > 0:
         next_donation = donations.queue.pop(0)
-        log_info(f"Searching animation for ${next_donation} donation.")
+        log_info(f"Searching animation for ${next_donation} donation...")
         source = sources.get_source_for_donation(next_donation)
 
         if source:

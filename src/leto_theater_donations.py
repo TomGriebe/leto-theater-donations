@@ -16,7 +16,7 @@ importlib.reload(streamlabs)
 
 
 def try_setup():
-    log_info("Trying to set up sources.")
+    log_info("Trying to set up sources...")
     idle_source = sources.get_idle_source()
 
     if idle_source:
@@ -49,7 +49,7 @@ def try_setup():
 
 # This is run as soon as the script is loaded, to set up the basic event handling.
 def script_load(_):
-    log_info("Loading script.")
+    log_info("Loading script...")
     obs.timer_add(try_setup, 500)
 
 
