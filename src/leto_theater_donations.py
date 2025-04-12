@@ -90,14 +90,18 @@ def script_update(settings):
 def script_properties():
     props = obs.obs_properties_create()
 
-    # Streamlabs API Key
-    obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
-    obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", sl_oauth.initiate_oauth_flow)
-
-    # Mock donation buttons
+    # Mock donations
+    obs.obs_properties_add_text(props, "donate_title", "Mock donations:", obs.OBS_TEXT_INFO)
     obs.obs_properties_add_text(props, "donate_value", "Donation:", obs.OBS_TEXT_DEFAULT)
     obs.obs_properties_add_button(props, "donate_btn", "Donate!", donations.handle_donation)
+
+    obs.obs_properties_add_text(props, "separator1", "", obs.OBS_TEXT_INFO)
+
+    # Streamlabs setup
+    obs.obs_properties_add_text(props, "streamlabs_title", "Streamlabs setup:", obs.OBS_TEXT_INFO)
+    obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
+    obs.obs_properties_add_button(props, "streamlabs_auth", "Authenticate", sl_oauth.initiate_oauth_flow)
 
     return props
 
