@@ -59,15 +59,19 @@ def try_sources_setup():
 
 # This is run as soon as the script is loaded, to set up the basic event handling.
 def script_load(settings):
-    log_info("Loading script...")
+    log_info("Loading Leto's Theater Reactions...")
 
+    sl_token.load_token()
     update_text_props(settings)
     obs.timer_add(try_sources_setup, 500)
 
-    if sl_token.load_token() is not None and not sl_token.is_token_valid():
-        log_info("Token is outdated, refreshing...")
-        sl_token.refresh_token()
-    elif sl_token.load_token() is None:
+    if sl_token.token_data:
+        if not sl_token.is_token_valid():
+            log_info("Token is outdated, refreshing...")
+            sl_token.refresh_token()
+        else:
+            log_info("Token is still valid.")
+    else:
         log_warn("No token loaded, you need to press the OAuth button!")
 
 

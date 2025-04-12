@@ -46,8 +46,10 @@ def is_token_valid():
     return now < obtained_at + expires_in - 60
 
 
+TOKEN_URL = "https://streamlabs.com/api/v2.0/token"
+
+
 def request_token(auth_code):
-    token_url = "https://streamlabs.com/api/v2.0/token"
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
@@ -56,7 +58,7 @@ def request_token(auth_code):
         "redirect_uri": REDIRECT_URI,
     }
 
-    response = requests.post(token_url, data=data)
+    response = requests.post(TOKEN_URL, data=data)
 
     if response.status_code == 200:
         new_token = response.json()
@@ -70,10 +72,9 @@ def request_token(auth_code):
 
 
 def refresh_token():
+    log_info("Refreshing access token...")
     global token_data
 
-    log_info("Refreshing access token...")
-    refresh_url = "https://streamlabs.com/api/v2.0/token"
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
@@ -81,7 +82,7 @@ def refresh_token():
         "refresh_token": token_data.get("refresh_token"),
     }
 
-    response = requests.post(refresh_url, data=data)
+    response = requests.post(TOKEN_URL, data=data)
     if response.status_code == 200:
         new_token = response.json()
         new_token["obtained_at"] = time.time()

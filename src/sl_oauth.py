@@ -16,11 +16,11 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
 
         if "code" in query_components:
             auth_code = query_components["code"][0]
-            log_info(f"Received auth code: {auth_code}")
+            log_info("Received auth code.")
             token = sl_token.request_token(auth_code)
 
             if token:
-                log_info(f"Access token obtained: {token}")
+                log_info("Access token obtained.")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html")
                 self.end_headers()
