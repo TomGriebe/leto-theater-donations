@@ -1,1 +1,2 @@
-pip install websockets
+pip install websockets requests
+pause
