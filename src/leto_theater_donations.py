@@ -35,6 +35,7 @@ def try_setup():
             animations.set_clear_on_media_end(source, True)
             animations.set_restart_on_activate(source, False)
             animations.add_anim_ended_handler(source)
+            obs.obs_source_media_stop(source)
             obs.obs_source_release(source)
         else:
             log_warn("One of the donation sources could not be found.")
