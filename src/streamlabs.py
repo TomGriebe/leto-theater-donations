@@ -8,4 +8,4 @@ OAUTH_PORT = 8080
 
 
 def start_oauth():
-    log_info("Starting OAuth")
+    log_info("Starting OAuth.")

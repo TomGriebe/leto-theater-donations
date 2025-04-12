@@ -12,7 +12,7 @@ def get_idle_source():
     source = obs.obs_get_source_by_name(IDLE_SOURCE)
 
     if source is None:
-        log_warn("Idle media source not found")
+        log_warn("Idle media source not found.")
     return source
 
 
@@ -30,15 +30,15 @@ def get_source_for_donation(amount):
         source_name = TIP_10_USD_SOURCE
 
     if source_name:
-        log_info(f"Chosen animation: '{source_name}'")
+        log_info(f"Chosen animation: '{source_name}'.")
         source = obs.obs_get_source_by_name(source_name)
 
         if source:
             return source
         else:
-            log_warn(f"Could not find source for name '{source_name}'")
+            log_warn(f"Could not find source for name '{source_name}'.")
     else:
-        log_warn(f"Could not find fitting animation for ${amount} tip")
+        log_warn(f"Could not find fitting animation for ${amount} tip.")
 
 
 def get_all_donation_sources():
