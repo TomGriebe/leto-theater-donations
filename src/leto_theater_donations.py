@@ -6,13 +6,18 @@ import animations
 import donations
 import obs_logging
 import sources
-import streamlabs
+import streamlabs.streamlabs_donations as sl_donations
+import streamlabs.streamlabs_oauth as sl_oauth
+import streamlabs.streamlabs_token as sl_token
 
+# Force reload of modules (OBS doesn't do it sometimes)
 importlib.reload(animations)
 importlib.reload(donations)
 importlib.reload(obs_logging)
 importlib.reload(sources)
-importlib.reload(streamlabs)
+importlib.reload(sl_donations)
+importlib.reload(sl_oauth)
+importlib.reload(sl_token)
 
 
 def try_setup():
@@ -54,8 +59,8 @@ def script_load(_):
 
 
 def script_update(settings):
-    streamlabs.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
-    streamlabs.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
+    sl_token.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
+    sl_token.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
 
     try:
         donate_value = obs.obs_data_get_string(settings, "donate_value")
@@ -71,7 +76,7 @@ def script_properties():
     # Streamlabs API Key
     obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
     obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
-    obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", streamlabs.start_oauth)
+    obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", sl_oauth.start_oauth)
 
     # Mock donation buttons
     obs.obs_properties_add_text(props, "donate_value", "Donation:", obs.OBS_TEXT_DEFAULT)
