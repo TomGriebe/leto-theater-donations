@@ -1,26 +1,31 @@
-import obspython as obs  # type: ignore
 from obs_logging import *
+import obs_logging
+import obspython as obs
 
 import importlib
+
 import animations
 import donations
 import obs_logging
 import sources
-import streamlabs.streamlabs_donations as sl_donations
-import streamlabs.streamlabs_oauth as sl_oauth
-import streamlabs.streamlabs_token as sl_token
+
+import sl_donations
+import sl_oauth
+import sl_token
 
 # Force reload of modules (OBS doesn't do it sometimes)
+importlib.reload(obs_logging)
 importlib.reload(animations)
 importlib.reload(donations)
 importlib.reload(obs_logging)
 importlib.reload(sources)
+
 importlib.reload(sl_donations)
 importlib.reload(sl_oauth)
 importlib.reload(sl_token)
 
 
-def try_setup():
+def try_sources_setup():
     log_info("Trying to set up sources...")
     idle_source = sources.get_idle_source()
 
@@ -48,17 +53,25 @@ def try_setup():
             log_warn("One of the donation sources could not be found.")
             return
 
-    obs.timer_remove(try_setup)
+    obs.timer_remove(try_sources_setup)
     log_info("Finished initial setup!")
 
 
 # This is run as soon as the script is loaded, to set up the basic event handling.
-def script_load(_):
+def script_load(settings):
     log_info("Loading script...")
-    obs.timer_add(try_setup, 500)
+
+    update_text_props(settings)
+    obs.timer_add(try_sources_setup, 500)
+
+    if sl_token.load_token() is not None and not sl_token.is_token_valid():
+        log_info("Token is outdated, refreshing...")
+        sl_token.refresh_token()
+    elif sl_token.load_token() is None:
+        log_warn("No token loaded, you need to press the OAuth button!")
 
 
-def script_update(settings):
+def update_text_props(settings):
     sl_token.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
     sl_token.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
 
@@ -69,6 +82,10 @@ def script_update(settings):
         donations.amount = None
 
 
+def script_update(settings):
+    update_text_props(settings)
+
+
 # This function sets up the UI properties (like buttons) for the script.
 def script_properties():
     props = obs.obs_properties_create()
@@ -76,7 +93,7 @@ def script_properties():
     # Streamlabs API Key
     obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
     obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
-    obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", sl_oauth.start_oauth)
+    obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", sl_oauth.initiate_oauth_flow)
 
     # Mock donation buttons
     obs.obs_properties_add_text(props, "donate_value", "Donation:", obs.OBS_TEXT_DEFAULT)

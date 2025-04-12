@@ -1,22 +1,15 @@
 from obs_logging import *
-import sys
 import os
 import time
-import threading
-import webbrowser
-import urllib.parse
 import json
 import requests
-import asyncio
-import websockets
 
 CLIENT_ID = ""
 CLIENT_SECRET = ""
 REDIRECT_URI = "http://localhost:8080/"
 SCOPE = "donations.read"
-OAUTH_PORT = 8080
 
-TOKEN_FILE = os.path.join(os.path.dirname(__file__), "streamlabs_token.json")
+TOKEN_FILE = os.path.join(os.path.dirname(__file__), "..", "streamlabs_token.json")
 
 token_data = {}
 
@@ -53,8 +46,32 @@ def is_token_valid():
     return now < obtained_at + expires_in - 60
 
 
+def request_token(auth_code):
+    token_url = "https://streamlabs.com/api/v2.0/token"
+    data = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "code": auth_code,
+        "grant_type": "authorization_code",
+        "redirect_uri": REDIRECT_URI,
+    }
+
+    response = requests.post(token_url, data=data)
+
+    if response.status_code == 200:
+        new_token = response.json()
+        new_token["obtained_at"] = time.time()
+        save_token(new_token)
+        log_info("Access token received!")
+        return new_token
+    else:
+        log_error(f'Token request failed: "{response.text}"')
+        return None
+
+
 def refresh_token():
     global token_data
+
     log_info("Refreshing access token...")
     refresh_url = "https://streamlabs.com/api/v2.0/token"
     data = {
