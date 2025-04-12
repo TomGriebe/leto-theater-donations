@@ -54,7 +54,8 @@ def script_load(_):
 
 
 def script_update(settings):
-    streamlabs.api_key = obs.obs_data_get_string(settings, "streamlabs_api_key")
+    streamlabs.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
+    streamlabs.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
 
 
 # This function sets up the UI properties (like buttons) for the script.
@@ -62,7 +63,9 @@ def script_properties():
     props = obs.obs_properties_create()
 
     # Streamlabs API Key
-    obs.obs_properties_add_text(props, "streamlabs_api_key", "Streamlabs API Key", obs.OBS_TEXT_PASSWORD)
+    obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret", obs.OBS_TEXT_PASSWORD)
+    obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", streamlabs.start_oauth)
 
     # Mock donation buttons
     obs.obs_properties_add_button(props, "donate_1_btn", "Donate $1!", donations.handle_donation_1_usd)
