@@ -16,7 +16,7 @@ importlib.reload(streamlabs)
 
 
 def try_setup():
-    log_info("Trying to set up sources")
+    log_info("Trying to set up sources.")
     idle_source = sources.get_idle_source()
 
     if idle_source:
@@ -49,7 +49,7 @@ def try_setup():
 
 # This is run as soon as the script is loaded, to set up the basic event handling.
 def script_load(_):
-    log_info("Loading script")
+    log_info("Loading script.")
     obs.timer_add(try_setup, 500)
 
 
@@ -57,20 +57,25 @@ def script_update(settings):
     streamlabs.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
     streamlabs.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
 
+    try:
+        donate_value = obs.obs_data_get_string(settings, "donate_value")
+        donations.amount = float(donate_value)
+    except:
+        donations.amount = None
+
 
 # This function sets up the UI properties (like buttons) for the script.
 def script_properties():
     props = obs.obs_properties_create()
 
     # Streamlabs API Key
-    obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret", obs.OBS_TEXT_PASSWORD)
+    obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
     obs.obs_properties_add_button(props, "streamlabs_auth", "Start Streamlabs OAuth", streamlabs.start_oauth)
 
     # Mock donation buttons
-    obs.obs_properties_add_button(props, "donate_1_btn", "Donate $1!", donations.handle_donation_1_usd)
-    obs.obs_properties_add_button(props, "donate_5_btn", "Donate $5!", donations.handle_donation_5_usd)
-    obs.obs_properties_add_button(props, "donate_10_btn", "Donate $10!", donations.handle_donation_10_usd)
+    obs.obs_properties_add_text(props, "donate_value", "Donation:", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_button(props, "donate_btn", "Donate!", donations.handle_donation)
 
     return props
 
