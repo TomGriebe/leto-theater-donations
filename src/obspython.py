@@ -1,3 +1,4 @@
+OBS_TEXT_INFO = "info"
 OBS_TEXT_DEFAULT = "default"
 OBS_TEXT_PASSWORD = "password"
 

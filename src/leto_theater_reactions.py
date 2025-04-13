@@ -109,8 +109,8 @@ def script_properties():
 
     obs.obs_properties_add_text(props, "separator2", "", obs.OBS_TEXT_INFO)
 
-    obs.obs_properties_add_button(props, "start_listen_btn", "Start listening", sl_donations.start_listener_thread)
-    obs.obs_properties_add_button(props, "stop_listen_btn", "Stop listening", sl_donations.stop_listener_thread)
+    obs.obs_properties_add_button(props, "start_listen_btn", "Start listening", sl_donations.activate)
+    obs.obs_properties_add_button(props, "stop_listen_btn", "Stop listening", sl_donations.deactivate)
 
     return props
 
