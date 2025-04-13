@@ -75,6 +75,11 @@ def script_load(settings):
         log_warn("No token loaded, you need to press the OAuth button!")
 
 
+def script_unload():
+    sl_donations.deactivate()
+    log_info("Script unload finished\n========\n")
+
+
 def update_text_props(settings):
     sl_token.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
     sl_token.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
