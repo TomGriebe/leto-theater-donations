@@ -13,7 +13,7 @@ You can find the instructions on the official [Python website](https://www.pytho
 
 ## Initial Setup
 
-These steps assume that you have installed python and OBS already, and have the code files downloaded to a folder on your PC.
+These steps assume that you have installed Python and OBS already, and have the code files downloaded to a folder on your PC.
 
 When I talk about a "script folder", I mean the folder where this Readme and the `src/` directory are placed as well.
 
