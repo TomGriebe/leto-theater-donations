@@ -1,2 +1,2 @@
-pip install websockets requests
+pip install websockets requests python-socketio aiohttp
 pause

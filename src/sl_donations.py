@@ -1,19 +1,20 @@
 from obs_logging import *
 import asyncio
+import requests
 import threading
-import websockets
 import sl_token
+import socketio
+import donations
 
 event_loop = None
 loop_thread = None
 loop_ready = threading.Event()
 
-websocket_connection = None
-active = False
+sio = None
 
 
 async def connect_websocket():
-    global websocket_connection, active
+    global sio
 
     ws_token = sl_token.request_socket_token()
 
@@ -21,39 +22,48 @@ async def connect_websocket():
         log_error("No socket token could be acquired.")
         return
 
-    ws_url = f"wss://sockets.streamlabs.com/socket.io/?token={ws_token}&EIO=3&transport=websocket"
-    log_info(ws_url)
-
     try:
-        websocket_connection = await websockets.connect(ws_url)
-        active = True
-        log_info("Connected to Streamlabs websocket.")
+        sio = socketio.AsyncClient()
 
-        asyncio.create_task(listen_websocket())
+        @sio.event
+        def connect():
+            log_info("connect event")
+
+        @sio.event
+        def disconnect():
+            log_info("disconnect event")
+
+        @sio.on("event")
+        def handle_event(data):
+            if data["type"] == "donation":
+                event_donations = data["message"]
+                log_info(f"{len(event_donations)} donations!")
+
+                for donation in event_donations:
+                    if donation["currency"] != "USD":
+                        continue
+
+                    try:
+                        amount = float(donation["amount"])
+                        donations.add_donation(amount)
+                    except:
+                        log_warn(f"Could not convert '{donation['amount']} to float.'")
+            else:
+                log_info("non-donation event: " + str(data))
+
+        await sio.connect(f"https://sockets.streamlabs.com?token={ws_token}")
+
+        asyncio.create_task(sio.wait())
     except Exception as e:
         log_error(f"Failed to connect: {e}")
 
 
 async def disconnect_websocket():
-    global websocket_connection, active
-    active = False
+    global sio
 
-    if websocket_connection:
-        await websocket_connection.close()
+    if sio:
+        await sio.disconnect()
         log_info("Websocket connection closed.")
-
-
-async def listen_websocket():
-    global websocket_connection, active
-
-    try:
-        while active:
-            message = await websocket_connection.recv()
-            log_info(f"Received message: {message}")
-    except websockets.ConnectionClosed:
-        log_info("Websocket connection was closed.")
-    except Exception as e:
-        log_error(f"Error while receiving message: {e}")
 
 
 def start_event_loop():
@@ -108,3 +118,38 @@ def deactivate(_=None, __=None):
     event_loop.call_soon_threadsafe(event_loop.stop)
     loop_thread.join()
     log_info("Event loop stopped!")
+
+
+def post_donation(amount):
+    if not sl_token.is_token_valid():
+        if not sl_token.refresh_token():
+            log_error("Cannot post donation: no valid tokens.")
+            return
+
+    access_token = sl_token.token_data.get("access_token")
+    url = "https://streamlabs.com/api/v2.0/donations"
+
+    payload = {
+        "name": "TEST",
+        "message": "This is a test donation",
+        "identifier": "test-donations@gmail.com",
+        "amount": f"{amount}",
+        "currency": "USD",
+    }
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "Authorization": f"Bearer {access_token}",
+    }
+
+    log_info(str(payload))
+    log_info(str(headers))
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    log_info(response.status_code)
+    log_info(response.reason)
+
+    if response.status_code == 200:
+        log_info(response.json())
