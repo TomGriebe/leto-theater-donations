@@ -17,23 +17,25 @@ These steps assume that you have installed Python and OBS already, and have the 
 
 When I talk about a "script folder", I mean the folder where this Readme and the `src/` directory are placed as well.
 
-1. Open the script folder and run `install-libraries.bat`. This will install all the Python packages we need.
-2. Open OBS and go to Tools > Scripts > Python Settings
-3. Set the Python Install Path to your Python directory
-4. Open the Scripts tab and click "+"
-5. Navigate to the script folder and open `leto_theater_reactions.py`
+1. Create [Media Sources](#media-sources)
+2. Open the script folder and run `install-libraries.bat`. This will install all the Python packages we need.
+3. Open OBS and go to Tools > Scripts > Python Settings
+4. Set the Python Install Path to your Python directory
+5. Open the Scripts tab and click "+"
+6. Navigate to the script folder and open `leto_theater_reactions.py`
 
 At this point, the script should already start and ask you to enter some info and press the OAuth button.
 
-6. Enter Client ID & Client Secret and press the OAuth button
-7. Authorize the script to read your donations and close the tab when done
-8. Press the restart button close to the "+" button
-9. Add the media sources for the donation animations
+7. Enter Client ID & Client Secret and press the OAuth button
+8. Authorize the script to read your donations and close the tab when done
+9. Press the restart button close to the "+" button
+10. Add the media sources for the donation animations
 
 ## Media Sources
 
-Right now there's 3 media sources to set up:
+Right now there's 4 media sources to set up. They need to be named exactly like this:
 
+- "Theater Idle"
 - "Theater Tip 1 USD" for tips from 1.00 to 4.99 USD
 - "Theater Tip 5 USD" for tips from 5.00 to 10.00 USD
 - "Theater Tip 10 USD" for tips from 10.00 USD upwards
