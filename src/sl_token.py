@@ -7,7 +7,7 @@ import requests
 CLIENT_ID = ""
 CLIENT_SECRET = ""
 REDIRECT_URI = "http://localhost:8080/"
-SCOPE = "socket.token"
+SCOPE = "donations.read donations.create socket.token"
 
 TOKEN_FILE = os.path.join(os.path.dirname(__file__), "..", "streamlabs_token.json")
 
