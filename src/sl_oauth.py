@@ -51,7 +51,12 @@ def handle_oauth(_, __):
     initiate_oauth_flow()
 
 
+oauth_thread = None
+
+
 def initiate_oauth_flow():
+    global oauth_thread
+
     auth_url = (
         f"https://streamlabs.com/api/v2.0/authorize"
         f"?client_id={sl_token.CLIENT_ID}"
@@ -60,8 +65,11 @@ def initiate_oauth_flow():
         f"&scope={sl_token.SCOPE}"
     )
 
-    oauth_thread = threading.Thread(target=start_oauth_server, daemon=True)
-    oauth_thread.start()
+    if oauth_thread and oauth_thread.is_alive():
+        log_info("OAuth server already running.")
+    else:
+        oauth_thread = threading.Thread(target=start_oauth_server, daemon=True)
+        oauth_thread.start()
 
     log_info(f"Visiting OAuth at {auth_url}")
     webbrowser.open(auth_url)
