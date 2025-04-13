@@ -24,8 +24,11 @@ importlib.reload(sl_donations)
 importlib.reload(sl_oauth)
 importlib.reload(sl_token)
 
+failed_sources_once = False
+
 
 def try_sources_setup():
+    global failed_sources_once
     log_info("Trying to set up sources...")
     idle_source = sources.get_idle_source()
 
@@ -36,7 +39,9 @@ def try_sources_setup():
         animations.add_anim_ended_handler(idle_source)
         obs.obs_source_release(idle_source)
     else:
-        log_warn("Idle source could not be found.")
+        if not failed_sources_once:
+            log_warn("Idle source could not be found.")
+            failed_sources_once = True
         return
 
     donation_sources = sources.get_all_donation_sources()
@@ -50,7 +55,9 @@ def try_sources_setup():
             obs.obs_source_media_stop(source)
             obs.obs_source_release(source)
         else:
-            log_warn("One of the donation sources could not be found.")
+            if not failed_sources_once:
+                log_warn("One of the donation sources could not be found.")
+                failed_sources_once = True
             return
 
     obs.timer_remove(try_sources_setup)
@@ -76,7 +83,7 @@ def script_load(settings):
     sl_donations.activate()
 
     # Start sources setup with short delay
-    obs.timer_add(try_sources_setup, 500)
+    obs.timer_add(try_sources_setup, 1000)
 
 
 def script_unload():

@@ -9,11 +9,7 @@ TIP_10_USD_SOURCE = "Theater Tip 10 USD"
 
 
 def get_idle_source():
-    source = obs.obs_get_source_by_name(IDLE_SOURCE)
-
-    if source is None:
-        log_warn("Idle media source not found.")
-    return source
+    return obs.obs_get_source_by_name(IDLE_SOURCE)
 
 
 def get_source_for_donation(amount):
