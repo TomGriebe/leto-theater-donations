@@ -9,6 +9,7 @@ import sl_token
 event_loop = None
 loop_thread = None
 loop_ready = threading.Event()
+disconnected = threading.Event()
 
 sio = None
 
@@ -24,14 +25,6 @@ async def connect_websocket():
 
     try:
         sio = socketio.AsyncClient()
-
-        @sio.event
-        def connect():
-            log_info("connect event")
-
-        @sio.event
-        def disconnect():
-            log_info("disconnect event")
 
         @sio.on("event")
         def handle_event(data):
@@ -63,7 +56,7 @@ async def disconnect_websocket():
 
     if sio:
         await sio.disconnect()
-        log_info("Websocket connection closed.")
+        disconnected.set()
 
 
 def start_event_loop():
@@ -100,7 +93,7 @@ def activate():
 
 
 def deactivate():
-    global event_loop, loop_thread
+    global event_loop, loop_thread, disconnected
 
     if not event_loop or not event_loop.is_running() and not loop_thread or not loop_thread.is_alive():
         log_warn("No event loop or loop thread to stop.")
@@ -112,10 +105,14 @@ def deactivate():
         log_warn("No loop thread to stop.")
         return
 
+    disconnected.clear()
+
     # Stop listening on the websocket
     log_info("Starting ws_disconnect coroutine.")
     future = asyncio.run_coroutine_threadsafe(disconnect_websocket(), event_loop)
     future.result()
+
+    disconnected.wait(timeout=10)
 
     # Stop the event loop
     log_info("Waiting for event loop to stop...")
