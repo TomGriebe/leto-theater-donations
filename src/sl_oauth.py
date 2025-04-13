@@ -47,7 +47,11 @@ def start_oauth_server():
             log_info("OAuth server closed.")
 
 
-def initiate_oauth_flow(_, __):
+def handle_oauth(_, __):
+    initiate_oauth_flow()
+
+
+def initiate_oauth_flow():
     auth_url = (
         f"https://streamlabs.com/api/v2.0/authorize"
         f"?client_id={sl_token.CLIENT_ID}"

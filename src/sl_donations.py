@@ -1,10 +1,10 @@
 from obs_logging import *
 import asyncio
-import requests
 import threading
 import sl_token
 import socketio
-import donations
+import animations
+import sl_token
 
 event_loop = None
 loop_thread = None
@@ -45,7 +45,7 @@ async def connect_websocket():
 
                     try:
                         amount = float(donation["amount"])
-                        donations.add_donation(amount)
+                        add_donation(amount)
                     except:
                         log_warn(f"Could not convert '{donation['amount']} to float.'")
             else:
@@ -74,8 +74,12 @@ def start_event_loop():
     event_loop.run_forever()
 
 
-def activate(_, __):
+def activate():
     global event_loop, loop_thread
+
+    if not sl_token.token_data or not sl_token.is_token_valid():
+        log_warn("Cannot start websockets without valid token.")
+        return
 
     if not event_loop or not event_loop.is_running():
         log_info("Starting websocket event loop.")
@@ -95,7 +99,7 @@ def activate(_, __):
     future.result()
 
 
-def deactivate(_=None, __=None):
+def deactivate():
     global event_loop, loop_thread
 
     if not event_loop or not event_loop.is_running() and not loop_thread or not loop_thread.is_alive():
@@ -120,36 +124,11 @@ def deactivate(_=None, __=None):
     log_info("Event loop stopped!")
 
 
-def post_donation(amount):
-    if not sl_token.is_token_valid():
-        if not sl_token.refresh_token():
-            log_error("Cannot post donation: no valid tokens.")
-            return
+queue = []
 
-    access_token = sl_token.token_data.get("access_token")
-    url = "https://streamlabs.com/api/v2.0/donations"
 
-    payload = {
-        "name": "TEST",
-        "message": "This is a test donation",
-        "identifier": "test-donations@gmail.com",
-        "amount": f"{amount}",
-        "currency": "USD",
-    }
-
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "Authorization": f"Bearer {access_token}",
-    }
-
-    log_info(str(payload))
-    log_info(str(headers))
-
-    response = requests.post(url, json=payload, headers=headers)
-
-    log_info(response.status_code)
-    log_info(response.reason)
-
-    if response.status_code == 200:
-        log_info(response.json())
+def add_donation(amount):
+    queue.append(amount)
+    log_info(f"${amount} Donation!")
+    log_info(f"Updated queue: {queue}")
+    animations.set_idle_looping(False)

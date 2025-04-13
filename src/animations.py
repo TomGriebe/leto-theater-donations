@@ -1,7 +1,7 @@
 import obspython as obs  # type: ignore
 from obs_logging import *
 import sources
-import donations
+import sl_donations
 
 
 def add_anim_ended_handler(source):
@@ -11,10 +11,10 @@ def add_anim_ended_handler(source):
 
 def load_next_animation(_):
     log_info("Selecting next animation:")
-    log_info(f"Donation queue: {donations.queue}")
+    log_info(f"Donation queue: {sl_donations.queue}")
 
-    if len(donations.queue) > 0:
-        next_donation = donations.queue.pop(0)
+    if len(sl_donations.queue) > 0:
+        next_donation = sl_donations.queue.pop(0)
         log_info(f"Searching animation for ${next_donation} donation...")
         source = sources.get_source_for_donation(next_donation)
 

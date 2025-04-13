@@ -5,7 +5,7 @@ import obspython as obs
 import importlib
 
 import animations
-import donations
+import test_donations
 import obs_logging
 import sources
 
@@ -16,7 +16,7 @@ import sl_token
 # Force reload of modules (OBS doesn't do it sometimes)
 importlib.reload(obs_logging)
 importlib.reload(animations)
-importlib.reload(donations)
+importlib.reload(test_donations)
 importlib.reload(obs_logging)
 importlib.reload(sources)
 
@@ -59,40 +59,44 @@ def try_sources_setup():
 
 # This is run as soon as the script is loaded, to set up the basic event handling.
 def script_load(settings):
-    log_info("Loading Leto's Theater Reactions...")
+    log_info("=== Leto's Theater Reactions ===")
+    log_info("Initializing script...")
+
+    get_text_field_values(settings)
 
     sl_token.load_token()
-    update_text_props(settings)
-    obs.timer_add(try_sources_setup, 500)
 
-    if sl_token.token_data:
-        if not sl_token.is_token_valid():
-            log_info("Token is outdated, refreshing...")
-            sl_token.refresh_token()
-        else:
-            log_info("Token is still valid.")
-    else:
-        log_warn("No token loaded, you need to press the OAuth button!")
+    if (not sl_token.token_data) or (not sl_token.is_token_valid() and not sl_token.refresh_token()):
+        log_error("Failed Setup: No valid Streamlabs token.")
+        log_error('Enter "Client ID" and "Client Secret", then press "OAuth".')
+        log_error("Afterwards, restart the script or OBS.")
+        return
+
+    # Setup websocket thread and listen for donations
+    sl_donations.activate()
+
+    # Start sources setup with short delay
+    obs.timer_add(try_sources_setup, 500)
 
 
 def script_unload():
     sl_donations.deactivate()
-    log_info("Script unload finished\n========\n")
+    log_info("Script unload finished\n")
 
 
-def update_text_props(settings):
+def get_text_field_values(settings):
     sl_token.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
     sl_token.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
 
     try:
         donate_value = obs.obs_data_get_string(settings, "donate_value")
-        donations.amount = float(donate_value)
+        test_donations.test_donation_value = float(donate_value)
     except:
-        donations.amount = None
+        test_donations.test_donation_value = None
 
 
 def script_update(settings):
-    update_text_props(settings)
+    get_text_field_values(settings)
 
 
 # This function sets up the UI properties (like buttons) for the script.
@@ -100,22 +104,19 @@ def script_properties():
     props = obs.obs_properties_create()
 
     # Mock donations
-    obs.obs_properties_add_text(props, "donate_title", "Mock donations:", obs.OBS_TEXT_INFO)
-    obs.obs_properties_add_text(props, "donate_value", "Donation:", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_button(props, "donate_btn", "Donate!", donations.handle_donation)
+    obs.obs_properties_add_text(props, "donate_title", "Send test donation:", obs.OBS_TEXT_INFO)
+    obs.obs_properties_add_text(props, "donate_value", "Value:", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_button(props, "donate_btn", "Send", test_donations.handle_test_donation)
 
     obs.obs_properties_add_text(props, "separator1", "", obs.OBS_TEXT_INFO)
 
     # Streamlabs setup
-    obs.obs_properties_add_text(props, "streamlabs_title", "Streamlabs setup:", obs.OBS_TEXT_INFO)
-    obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
-    obs.obs_properties_add_button(props, "streamlabs_auth_btn", "Authenticate", sl_oauth.initiate_oauth_flow)
+    obs.obs_properties_add_text(props, "sl_title", "Streamlabs setup:", obs.OBS_TEXT_INFO)
+    obs.obs_properties_add_text(props, "sl_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_text(props, "sl_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
+    obs.obs_properties_add_button(props, "sl_oauth_btn", "OAuth", sl_oauth.handle_oauth)
 
     obs.obs_properties_add_text(props, "separator2", "", obs.OBS_TEXT_INFO)
-
-    obs.obs_properties_add_button(props, "start_listen_btn", "Start listening", sl_donations.activate)
-    obs.obs_properties_add_button(props, "stop_listen_btn", "Stop listening", sl_donations.deactivate)
 
     return props
 

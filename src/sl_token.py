@@ -75,6 +75,10 @@ def refresh_token():
     global token_data
     log_info("Refreshing access token...")
 
+    if not token_data:
+        log_warn("No token data, cannot refresh.")
+        return
+
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
