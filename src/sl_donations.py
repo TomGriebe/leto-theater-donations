@@ -15,12 +15,12 @@ active = False
 async def connect_websocket():
     global websocket_connection, active
 
-    if not sl_token.is_token_valid():
-        if not sl_token.refresh_token():
-            log_error("No valid access token available.")
-            return
+    ws_token = sl_token.request_socket_token()
 
-    ws_token = sl_token.token_data.get("access_token")
+    if not ws_token:
+        log_error("No socket token could be acquired.")
+        return
+
     ws_url = f"wss://sockets.streamlabs.com/socket.io/?token={ws_token}&EIO=3&transport=websocket"
     log_info(ws_url)
 
@@ -85,7 +85,7 @@ def activate(_, __):
     future.result()
 
 
-def deactivate(_, __):
+def deactivate(_=None, __=None):
     global event_loop, loop_thread
 
     if not event_loop or not event_loop.is_running() and not loop_thread or not loop_thread.is_alive():

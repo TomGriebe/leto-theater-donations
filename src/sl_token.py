@@ -7,7 +7,7 @@ import requests
 CLIENT_ID = ""
 CLIENT_SECRET = ""
 REDIRECT_URI = "http://localhost:8080/"
-SCOPE = "donations.read"
+SCOPE = "socket.token"
 
 TOKEN_FILE = os.path.join(os.path.dirname(__file__), "..", "streamlabs_token.json")
 
@@ -72,8 +72,8 @@ def request_token(auth_code):
 
 
 def refresh_token():
-    log_info("Refreshing access token...")
     global token_data
+    log_info("Refreshing access token...")
 
     data = {
         "client_id": CLIENT_ID,
@@ -91,4 +91,31 @@ def refresh_token():
         return new_token
     else:
         log_error(f'Token refresh failed: "{response.text}"')
+        return None
+
+
+SOCKET_TOKEN_URL = "https://streamlabs.com/api/v2.0/socket/token"
+
+
+def request_socket_token():
+    global token_data
+    log_info("Requesting socket token...")
+
+    if not is_token_valid():
+        if not refresh_token():
+            log_error("No valid access token available.")
+            return
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f'Bearer {token_data.get("access_token")}',
+    }
+
+    response = requests.get(SOCKET_TOKEN_URL, headers=headers)
+
+    if response.status_code == 200:
+        socket_token = response.json()
+        return socket_token["socket_token"]
+    else:
+        log_error(f"Socket token request failed: {response.text}")
         return None
