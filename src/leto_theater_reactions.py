@@ -85,8 +85,8 @@ def script_unload():
 
 
 def get_text_field_values(settings):
-    sl_token.CLIENT_ID = obs.obs_data_get_string(settings, "streamlabs_client_id")
-    sl_token.CLIENT_SECRET = obs.obs_data_get_string(settings, "streamlabs_client_secret")
+    sl_token.CLIENT_ID = obs.obs_data_get_string(settings, "sl_client_id")
+    sl_token.CLIENT_SECRET = obs.obs_data_get_string(settings, "sl_client_secret")
 
     try:
         donate_value = obs.obs_data_get_string(settings, "donate_value")
