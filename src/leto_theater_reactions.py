@@ -54,7 +54,7 @@ def try_sources_setup():
             return
 
     obs.timer_remove(try_sources_setup)
-    log_info("Finished initial setup!")
+    log_info("Sources are set up!")
 
 
 # This is run as soon as the script is loaded, to set up the basic event handling.
@@ -105,7 +105,12 @@ def script_properties():
     obs.obs_properties_add_text(props, "streamlabs_title", "Streamlabs setup:", obs.OBS_TEXT_INFO)
     obs.obs_properties_add_text(props, "streamlabs_client_id", "Client ID:", obs.OBS_TEXT_DEFAULT)
     obs.obs_properties_add_text(props, "streamlabs_client_secret", "Client Secret:", obs.OBS_TEXT_PASSWORD)
-    obs.obs_properties_add_button(props, "streamlabs_auth", "Authenticate", sl_oauth.initiate_oauth_flow)
+    obs.obs_properties_add_button(props, "streamlabs_auth_btn", "Authenticate", sl_oauth.initiate_oauth_flow)
+
+    obs.obs_properties_add_text(props, "separator2", "", obs.OBS_TEXT_INFO)
+
+    obs.obs_properties_add_button(props, "start_listen_btn", "Start listening", sl_donations.start_listener_thread)
+    obs.obs_properties_add_button(props, "stop_listen_btn", "Stop listening", sl_donations.stop_listener_thread)
 
     return props
 
