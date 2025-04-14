@@ -1,11 +1,25 @@
 import obspython as obs  # type: ignore
 from obs_logging import *
+import random
 
+MAX_DONATION = 1000000
 IDLE_SOURCE = "Theater Idle"
 
-TIP_1_USD_SOURCE = "Theater Tip 1 USD"
-TIP_5_USD_SOURCE = "Theater Tip 5 USD"
-TIP_10_USD_SOURCE = "Theater Tip 10 USD"
+
+sources = [
+    {"name": "Theater Tip 1 USD", "from": 0, "to": 5},
+    {"name": "Theater Tip 5 USD", "from": 5, "to": 10},
+    {"name": "Theater Tip 10 USD", "from": 10, "to": MAX_DONATION},
+]
+
+
+def get_source_name_for_amount(sources, amount):
+    matching = [source for source in sources if source["from"] <= amount < source["to"]]
+
+    if not matching:
+        return None
+
+    return random.choice(matching)["name"]
 
 
 def get_idle_source():
@@ -16,14 +30,7 @@ def get_source_for_donation(amount):
     if amount is None:
         return None
 
-    source_name = None
-
-    if amount >= 1:
-        source_name = TIP_1_USD_SOURCE
-    if amount >= 5:
-        source_name = TIP_5_USD_SOURCE
-    if amount >= 10:
-        source_name = TIP_10_USD_SOURCE
+    source_name = get_source_name_for_amount(amount)
 
     if source_name:
         log_info(f"Chosen animation: '{source_name}'.")
@@ -38,8 +45,4 @@ def get_source_for_donation(amount):
 
 
 def get_all_donation_sources():
-    return [
-        obs.obs_get_source_by_name(TIP_1_USD_SOURCE),
-        obs.obs_get_source_by_name(TIP_5_USD_SOURCE),
-        obs.obs_get_source_by_name(TIP_10_USD_SOURCE),
-    ]
+    return [source["name"] for source in sources]
