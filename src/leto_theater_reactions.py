@@ -46,7 +46,9 @@ def try_sources_setup():
 
     donation_sources = sources.get_all_donation_sources()
 
-    for source in donation_sources:
+    for source_name in donation_sources:
+        source = obs.obs_get_source_by_name(source_name)
+
         if source:
             animations.set_looping(source, False)
             animations.set_clear_on_media_end(source, True)

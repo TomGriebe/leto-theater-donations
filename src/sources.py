@@ -30,7 +30,7 @@ def get_source_for_donation(amount):
     if amount is None:
         return None
 
-    source_name = get_source_name_for_amount(amount)
+    source_name = get_source_name_for_amount(sources, amount)
 
     if source_name:
         log_info(f"Chosen animation: '{source_name}'.")
