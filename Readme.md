@@ -7,7 +7,7 @@ The animations will wait for your idle loop to finish, so you can properly blend
 
 OBS scripts need Python to run, so you will need to install it, if you haven't already.
 
-To check if you have an installation of Python, open your Terminal and run `python --version`. If you get an error, you will have to install it.
+To check if you have an installation of Python, open your Terminal and run `python --version`. If you get an error, you don't have it.
 
 You can find the instructions on the official [Python website](https://www.python.org/downloads/).
 
