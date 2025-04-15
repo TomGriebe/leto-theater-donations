@@ -20,7 +20,17 @@ Right now there's 4 media sources to set up. They need to be named exactly like 
 - "Theater Tip 5 USD" for tips from 5.00 to 10.00 USD
 - "Theater Tip 10 USD" for tips from 10.00 USD upwards
 
-OBS has limited UI possibilities, so the price ranges have to be adjusted in the code. I've tried to make it as simple as possible, you should just have to touch the list at the top of the `sources.py` file.
+OBS has limited UI possibilities, so the price ranges have to be adjusted in the code. I've tried to make it as simple as possible, you should just have to touch the list at the top of the `sources.py` file:
+
+```python
+sources = [
+    {"name": "Theater Tip 1 USD", "from": 0, "to": 5},
+    {"name": "Theater Tip 5 USD", "from": 5, "to": 10},
+    {"name": "Theater Tip 10 USD", "from": 10, "to": MAX_DONATION},
+]
+```
+
+For example, "Theater Tip 1 USD" will be triggered by donations from $1 to $4.99 (higher or equal to 0, lower than 5).
 
 You can hide the tip sources in a folder, the important thing is that the names match.
 
