@@ -30,7 +30,7 @@ sources = [
 ]
 ```
 
-For example, "Theater Tip 1 USD" will be triggered by donations from $1 to $4.99 (higher or equal to 0, lower than 5).
+For example, "Theater Tip 1 USD" will be triggered by donations from $0 to $4.99 (higher or equal to 0, lower than 5).
 
 You can hide the tip sources in a folder, the important thing is that the names match.
 
