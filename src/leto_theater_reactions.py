@@ -115,7 +115,13 @@ def script_properties():
     # Mock donations
     obs.obs_properties_add_text(props, "donate_title", "Send test donation:", obs.OBS_TEXT_INFO)
     obs.obs_properties_add_text(props, "donate_value", "Value:", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_button(props, "donate_btn", "Send", test_donations.handle_test_donation)
+
+    obs.obs_properties_add_button(
+        props, "donate_streamlabs_btn", "Send (Streamlabs)", test_donations.handle_test_donation
+    )
+    obs.obs_properties_add_button(
+        props, "donate_offline_btn", "Send (offline)", test_donations.handle_test_donation_offline
+    )
 
     obs.obs_properties_add_text(props, "separator1", "", obs.OBS_TEXT_INFO)
 

@@ -1,8 +1,13 @@
 from obs_logging import *
 import sl_token
+import sl_donations
 import requests
 
 test_donation_value = 0
+
+
+def handle_test_donation_offline(_, __):
+    sl_donations.add_donation(test_donation_value)
 
 
 def handle_test_donation(_, __):
