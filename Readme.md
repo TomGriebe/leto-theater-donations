@@ -11,6 +11,19 @@ To check if you have an installation of Python, open your Terminal and run `pyth
 
 You can find the instructions on the official [Python website](https://www.python.org/downloads/).
 
+## Media Sources
+
+Right now there's 4 media sources to set up. They need to be named exactly like this:
+
+- "Theater Idle"
+- "Theater Tip 1 USD" for tips from 1.00 to 4.99 USD
+- "Theater Tip 5 USD" for tips from 5.00 to 10.00 USD
+- "Theater Tip 10 USD" for tips from 10.00 USD upwards
+
+OBS has limited UI possibilities, so the price ranges have to be adjusted in the code. I've tried to make it as simple as possible, you should just have to touch the list at the top of the `sources.py` file.
+
+You can hide the tip sources in a folder, the important thing is that the names match.
+
 ## Initial Setup
 
 These steps assume that you have installed Python and OBS already, and have the code files downloaded to a folder on your PC.
@@ -31,13 +44,4 @@ At this point, the script should already start and ask you to enter some info an
 9. Press the restart button close to the "+" button
 10. Add the media sources for the donation animations
 
-## Media Sources
-
-Right now there's 4 media sources to set up. They need to be named exactly like this:
-
-- "Theater Idle"
-- "Theater Tip 1 USD" for tips from 1.00 to 4.99 USD
-- "Theater Tip 5 USD" for tips from 5.00 to 10.00 USD
-- "Theater Tip 10 USD" for tips from 10.00 USD upwards
-
-OBS has limited UI possibilities, so for now just ask me what kind of tiers you want to have and I will adjust the code.
+Whenever you make changes in the code, like adjusting the tip tiers, you need to either restart OBS, or press the script reload button again, like in step 9.
